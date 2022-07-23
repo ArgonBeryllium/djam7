@@ -32,7 +32,7 @@ struct Scene
 
 	virtual void start() {}
 	virtual void load() {}
-	virtual void unload() {}
+	virtual void unload() { set.clear(); }
 
 	virtual void loop()
 	{
