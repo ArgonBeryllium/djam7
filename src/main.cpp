@@ -1,13 +1,10 @@
-#include <SDL2/SDL_render.h>
-#include <cstdlib>
-#include <functional>
 #include <iostream>
 #include <cumt.h>
-#include <cumt_common.h>
-#include <cumt_render.h>
 #include "assets.h"
-#include "cumt_things.h"
 #include "scenes.h"
+#include "boxer.h"
+#include "states.h"
+
 using namespace cumt;
 
 struct SplashScene : Scene
@@ -27,124 +24,6 @@ struct SplashScene : Scene
 	{
 		if(getActive()==this)
 			Scene::setActive(index+1);
-	}
-};
-
-struct Boxer;
-enum hitDir
-{
-	NONE = 0,
-	LEFT = 1, RIGHT = 2,
-	BOTH = 3
-};
-struct State
-{
-	std::function<State*()> get_next;
-	float dur = 0.5, t = 0;
-	bool interruptable = true;
-	hitDir vuln = BOTH;
-	hitDir dmg = NONE;
-	float remaining() { return dur-t; }
-	float completion() { return t/dur; }
-
-	SDL_Texture** tex = t_debug_sided;
-	Boxer* parent;
-
-	State(Boxer* parent_) : parent(parent_) {}
-
-	virtual void enter() {}
-	virtual void update() {}
-	virtual void exit() {}
-	virtual void interrupt() {}
-};
-struct IdleState : State
-{
-	IdleState(Boxer* parent_) : State(parent_)
-	{
-		get_next = [this]() { return new IdleState(parent); };
-		tex = t_test_idle;
-		vuln = LEFT;
-	}
-};
-struct Boxer : Thing2D
-{
-	State* state = new IdleState(this);
-	Boxer* opponent;
-	bool is_player;
-
-	Boxer(bool is_player_ = false) :
-		Thing2D(is_player_?v2f(0,.1):v2f(0,-.1)), is_player(is_player_) {}
-
-	bool setState(State* next, bool interrupt = true, bool auto_delete = true)
-	{
-		if(interrupt && !state->interruptable)
-		{
-			if(auto_delete)
-				delete next;
-			return false;
-		}
-		if(interrupt) state->interrupt();
-
-		state->exit();
-		delete state;
-		state = next;
-		state->enter();
-
-		return true;
-	}
-	void render() override
-	{
-		using namespace shitrndr;
-		Copy(state->tex[is_player], getRect());
-	}
-	void update() override
-	{
-		state->update();
-		state->t += FD::delta;
-		if(state->t>=state->dur)
-		{
-			setState(state->get_next(), false);
-		}
-	}
-};
-struct HitState : State
-{
-	HitState(Boxer* parent_) : State(parent_)
-	{
-		get_next = [this]() { return new IdleState(parent); };
-		tex = t_test_hit;
-	}
-};
-struct PunchState : State
-{
-	bool hit = 0;
-	float dmg_v = .2;
-	PunchState(Boxer* parent_) : State(parent_)
-	{
-		get_next = [this]() { return new IdleState(parent); };
-		dur = .2;
-		tex = t_test_punch;
-		dmg = LEFT;
-		vuln = NONE;
-		interruptable = false;
-	}
-	void update() override
-	{
-		if(hit) return;
-		if(parent->opponent->state->vuln & dmg)
-		{
-			parent->opponent->setState(new HitState(parent->opponent));
-			hit = true;
-		}
-	}
-};
-struct WindupState : State
-{
-	WindupState(Boxer* parent_, float dur_) : State(parent_)
-	{
-		dur = dur_;
-		get_next = [this]() { return new PunchState(parent); };
-		tex = t_test_windup;
 	}
 };
 
