@@ -11,7 +11,8 @@ enum hitDir
 {
 	NONE = 0,
 	LEFT = 1, RIGHT = 2,
-	BOTH = 3
+	BOTH = 3,
+	BACK = 4
 };
 
 struct State
@@ -30,28 +31,23 @@ struct State
 
 	SDL_Texture** tex = t_debug_sided;
 
-	State(StateData* data_) : data(data_) {}
+	State(StateData* data_);
 
 	virtual void enter() {}
 	virtual void update() {}
 	virtual void exit(State* next) {}
 	virtual void interrupt() {}
 };
+
 struct IdleState : State
 {
-	IdleState(StateData* data_) : State(data_)
-	{
-		get_next = [this]() { return new IdleState(data); };
-		tex = data->tex_idle;
-		dur = data->dur_idle_base + cumt::common::frand()*data->dur_idle_range;
-		vuln = LEFT;
-	}
+	IdleState(StateData* data_);
 };
+
 struct HitState : State
 {
 	HitState(StateData* data_) : State(data_)
 	{
-		get_next = [this]() { return new IdleState(data); };
 		tex = data->tex_hit;
 		dur = data->dur_hit;
 		if(!data->parent->is_player() && ScoreKeeper::getStreak())
@@ -74,8 +70,7 @@ struct PunchState : State
 	bool hit = 0;
 	PunchState(StateData* data_) : State(data_)
 	{
-		get_next = [this]() { return new IdleState(data); };
-		interruptable = false;
+		interruptable = data->parent->is_player();
 		dur = data->dur_punch;
 		tex = data->tex_punch;
 		dmg = LEFT;
@@ -100,11 +95,19 @@ struct WindupState : State
 	}
 };
 
+struct DodgeState : State
+{
+	DodgeState(StateData* data_, const hitDir& dir) : State(data_)
+	{
+		vuln = dir;
+		tex = t_debug_sided;
+	}
+};
+
 struct SwitchingState : State
 {
 	SwitchingState(StateData* data_) : State(data_)
 	{
-		get_next = [this](){ return new IdleState(data); };
 		interruptable = false;
 		tex = data->tex_idle;
 	}

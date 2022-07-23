@@ -1,4 +1,5 @@
 #pragma once
+#include <SDL2/SDL_render.h>
 #include <cumt_things.h>
 #include "assets.h"
 
@@ -26,9 +27,10 @@ struct Boxer : cumt::Thing2D
 	Boxer* opponent;
 	bool is_player();
 
-	Boxer();
+	Boxer(SDL_Texture** tex_idle_ = t_test_idle);
 	virtual ~Boxer();
 
+	virtual State* pickAction();
 	bool setState(State* next, bool interrupt = true, bool auto_delete = true);
 	void render() override;
 	void update() override;

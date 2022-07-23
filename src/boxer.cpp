@@ -1,13 +1,14 @@
 #include "boxer.h"
+#include "cumt_common.h"
 #include "gamemanager.h"
 #include "states.h"
-#include <optional>
 
 using namespace cumt;
 
-Boxer::Boxer()
+Boxer::Boxer(SDL_Texture** tex_idle_)
 {
 	sd.parent = this;
+	sd.tex_idle = tex_idle_;
 	state = new IdleState(&sd);
 }
 Boxer::~Boxer()
@@ -34,6 +35,13 @@ bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 	state->enter();
 
 	return true;
+}
+
+State* Boxer::pickAction()
+{
+	if(common::frand()>.5)
+		return new WindupState(&sd);
+	return new IdleState(&sd);
 }
 
 void Boxer::update()

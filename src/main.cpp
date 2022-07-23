@@ -1,3 +1,4 @@
+#include <SDL2/SDL_keycode.h>
 #include <iostream>
 #include <cumt.h>
 #include "assets.h"
@@ -42,11 +43,11 @@ struct GameScene : Scene
 		Thing2D::view_pos = {.5, .5};
 
 		a = set.instantiate(new Boxer(), "boxer A");
-		b = set.instantiate(new Boxer(), "boxer B");
+		b = set.instantiate(new Boxer(t_test2_idle), "boxer B");
 		a->opponent = b;
 		b->opponent = a;
 
-		a->sd.dur_windup = .1;
+		a->sd.dur_windup = .2;
 		a->sd.dur_punch = .1;
 
 		b->sd.tex_idle = t_test2_idle;
@@ -54,8 +55,8 @@ struct GameScene : Scene
 		b->sd.tex_windup = t_test2_windup;
 		b->sd.tex_hit = t_test2_hit;
 		b->sd.dur_windup = .5;
-		b->sd.dur_punch = .5;
-		b->sd.dur_hit = .5;
+		b->sd.dur_punch = .2;
+		b->sd.dur_hit = .7;
 
 		GM::init(a, b);
 		ScoreKeeper::init();
@@ -82,6 +83,19 @@ struct GameScene : Scene
 				if(!dynamic_cast<WindupState*>(getP()->state))
 					getP()->setState(new WindupState(&getP()->sd));
 				break;
+			case SDLK_LEFT:
+			case SDLK_a:
+				getP()->setState(new DodgeState(&getP()->sd, LEFT));
+				break;
+			case SDLK_RIGHT:
+			case SDLK_d:
+				getP()->setState(new DodgeState(&getP()->sd, RIGHT));
+				break;
+			case SDLK_DOWN:
+			case SDLK_s:
+				getP()->setState(new DodgeState(&getP()->sd, BACK));
+				break;
+
 			case SDLK_r:
 				unload();
 				load();
