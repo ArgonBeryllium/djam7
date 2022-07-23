@@ -39,7 +39,7 @@ struct GameScene : Scene
 	{
 		using namespace shitrndr;
 		bg_col = {45,25,45,255};
-		Thing2D::view_scale = 5;
+		Thing2D::view_scale = 8;
 		Thing2D::view_pos = {.5, .5};
 
 		a = set.instantiate(new Boxer(), "boxer A");
@@ -141,8 +141,8 @@ void gameKeyDown(const SDL_Keycode& k)
 int main()
 {
 	InitParams ip;
-	ip.sr_ps = 1;
-	quickInit(480, 540, ip);
+	ip.sr_ps = 2;
+	quickInit(540, 720, ip);
 
 	gameSetup();
 	onLoop = gameLoop;

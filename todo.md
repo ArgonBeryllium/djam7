@@ -2,9 +2,12 @@
 - [ ] health
 - [ ] win/lose states
 - [ ] score display
+- [ ] dodge durs
 
 # important
-- [ ] left/right punches & windups
+- [ ] left/right punches & windups & hits
+- [ ] replace Texture** with Clips
+- [ ] introduce differentiation between being hit and other interrupts
 - [ ] K/Os
 - [ ] main character art
 - [ ] background art

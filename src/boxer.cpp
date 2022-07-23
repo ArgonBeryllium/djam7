@@ -62,10 +62,4 @@ void Boxer::render()
 {
 	using namespace shitrndr;
 	Copy(state->tex[is_player()], getRect());
-	if(is_player())
-	{
-		SetColour({255,0,0,255});
-		auto c = spaceToScr(centre());
-		FillCircle(c.x, c.y, 3);
-	}
 }

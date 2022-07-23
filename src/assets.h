@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
+#include <cstddef>
 #include <cumt_audio.h>
 #include <cumt_logging.h>
 #include <cumt_render.h>
@@ -29,6 +30,17 @@ inline static SDL_Texture* loadTex(const char* path)
 inline Mix_Chunk* sfx_shoot;
 inline SDL_Texture *t_test_idle[2], *t_test_hit[2], *t_test_punch[2], *t_test_windup[2], *t_debug, *t_debug_sided[2];
 inline SDL_Texture *t_test2_idle[2], *t_test2_hit[2], *t_test2_punch[2], *t_test2_windup[2];
+
+struct Clip
+{
+	size_t n_frames;
+	SDL_Texture** frames;
+
+	inline SDL_Texture* getFrame(float f)
+	{
+		return frames[size_t(std::round(f*n_frames))];
+	}
+};
 
 inline static void loadAssets()
 {
