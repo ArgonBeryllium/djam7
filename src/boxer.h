@@ -27,6 +27,7 @@ struct Boxer : cumt::Thing2D
 	bool is_player;
 
 	Boxer(bool is_player_ = false);
+	virtual ~Boxer();
 
 	bool setState(State* next, bool interrupt = true, bool auto_delete = true);
 	void render() override;

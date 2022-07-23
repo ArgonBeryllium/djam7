@@ -31,23 +31,30 @@ struct GameScene : Scene
 {
 	Boxer* a, *b;
 	inline Boxer* getP() { return a->is_player?a:b; }
-	void start() override
-	{
-		a = set.instantiate(new Boxer(true), "boxer A");
-		b = set.instantiate(new Boxer(false), "boxer B");
-		a->opponent = b;
-		b->opponent = a;
-		b->sd.tex_idle = t_test2_idle;
-		b->sd.tex_punch = t_test2_punch;
-		b->sd.tex_windup = t_test2_windup;
-		b->sd.tex_hit = t_test2_hit;
-	}
+	inline Boxer* getO() { return b->is_player?a:b; }
 	void load() override
 	{
 		using namespace shitrndr;
 		bg_col = {45,25,45,255};
 		Thing2D::view_scale = 5;
 		Thing2D::view_pos = {.5, .5};
+
+		a = set.instantiate(new Boxer(true), "boxer A");
+		b = set.instantiate(new Boxer(false), "boxer B");
+		a->opponent = b;
+		b->opponent = a;
+
+		b->sd.tex_idle = t_test2_idle;
+		b->sd.tex_punch = t_test2_punch;
+		b->sd.tex_windup = t_test2_windup;
+		b->sd.tex_hit = t_test2_hit;
+		b->sd.dur_windup = .5;
+		b->sd.dur_punch = .5;
+	}
+	void unload() override
+	{
+		set.destroy(a);
+		set.destroy(b);
 	}
 	void loop() override
 	{
@@ -62,9 +69,13 @@ struct GameScene : Scene
 			case SDLK_z:
 				getP()->setState(new WindupState(&getP()->sd));
 				break;
+			case SDLK_r:
+				unload();
+				load();
+				break;
 			case SDLK_SPACE:
-				a->setState(new SwitchingState(&a->sd));
-				b->setState(new SwitchingState(&b->sd));
+				a->setState(new SwitchingState(&a->sd), false);
+				b->setState(new SwitchingState(&b->sd), false);
 				break;
 			default: break;
 		}

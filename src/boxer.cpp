@@ -10,6 +10,11 @@ Boxer::Boxer(bool is_player_) :
 	sd.parent = this;
 	state = new IdleState(&sd);
 }
+Boxer::~Boxer()
+{
+	delete state;
+}
+
 bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 {
 	if(interrupt && !state->interruptable)

@@ -63,6 +63,7 @@ struct PunchState : State
 		interruptable = false;
 		dur = data->dur_punch;
 		tex = data->tex_punch;
+		dmg = LEFT;
 	}
 	void update() override
 	{
