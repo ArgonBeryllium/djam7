@@ -22,7 +22,7 @@ struct SplashScene : Scene
 	}
 	void onKey(SDL_Keycode k) override
 	{
-		if(getActive()==this)
+		if(nactive==index)
 			Scene::setActive(index+1);
 	}
 };
@@ -37,12 +37,17 @@ struct GameScene : Scene
 		b = set.instantiate(new Boxer(false), "boxer B");
 		a->opponent = b;
 		b->opponent = a;
+		b->sd.tex_idle = t_test2_idle;
+		b->sd.tex_punch = t_test2_punch;
+		b->sd.tex_windup = t_test2_windup;
+		b->sd.tex_hit = t_test2_hit;
 	}
 	void load() override
 	{
 		using namespace shitrndr;
 		bg_col = {45,25,45,255};
-		Thing2D::view_scale = 4;
+		Thing2D::view_scale = 5;
+		Thing2D::view_pos = {.5, .5};
 	}
 	void loop() override
 	{
@@ -54,8 +59,12 @@ struct GameScene : Scene
 	{
 		switch(k)
 		{
+			case SDLK_z:
+				getP()->setState(new WindupState(&getP()->sd));
+				break;
 			case SDLK_SPACE:
-				getP()->setState(new WindupState(getP(), .2));
+				a->setState(new SwitchingState(&a->sd));
+				b->setState(new SwitchingState(&b->sd));
 				break;
 			default: break;
 		}

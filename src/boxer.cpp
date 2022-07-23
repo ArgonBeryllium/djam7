@@ -1,12 +1,14 @@
 #include "boxer.h"
 #include "states.h"
+#include <optional>
 
 using namespace cumt;
 
 Boxer::Boxer(bool is_player_) :
 	Thing2D(is_player_?cumt::v2f(0,.1):cumt::v2f(0,-.1)), is_player(is_player_)
 {
-	state = new IdleState(this);
+	sd.parent = this;
+	state = new IdleState(&sd);
 }
 bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 {
@@ -25,10 +27,17 @@ bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 
 	return true;
 }
+
 void Boxer::render()
 {
 	using namespace shitrndr;
 	Copy(state->tex[is_player], getRect());
+	if(is_player)
+	{
+		SetColour({255,0,0,255});
+		auto c = spaceToScr(centre());
+		FillCircle(c.x, c.y, 3);
+	}
 }
 void Boxer::update()
 {

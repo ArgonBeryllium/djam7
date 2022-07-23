@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include "boxer.h"
 #include "assets.h"
+#include "cumt_common.h"
 
 enum hitDir
 {
@@ -10,20 +11,24 @@ enum hitDir
 	LEFT = 1, RIGHT = 2,
 	BOTH = 3
 };
+
 struct State
 {
+	StateData* data;
 	std::function<State*()> get_next;
-	float dur = 0.5, t = 0;
+
 	bool interruptable = true;
 	hitDir vuln = BOTH;
 	hitDir dmg = NONE;
+
+	float dur = 0.5;
+	float t = 0;
 	float remaining() { return dur-t; }
 	float completion() { return t/dur; }
 
 	SDL_Texture** tex = t_debug_sided;
-	Boxer* parent;
 
-	State(Boxer* parent_) : parent(parent_) {}
+	State(StateData* data_) : data(data_) {}
 
 	virtual void enter() {}
 	virtual void update() {}
@@ -32,52 +37,67 @@ struct State
 };
 struct IdleState : State
 {
-	IdleState(Boxer* parent_) : State(parent_)
+	IdleState(StateData* data_) : State(data_)
 	{
-		get_next = [this]() { return new IdleState(parent); };
-		tex = t_test_idle;
+		get_next = [this]() { return new IdleState(data); };
+		tex = data->tex_idle;
+		dur = data->dur_idle_base + cumt::common::frand()*data->dur_idle_range;
 		vuln = LEFT;
 	}
 };
 struct HitState : State
 {
-	HitState(Boxer* parent_) : State(parent_)
+	HitState(StateData* data_) : State(data_)
 	{
-		get_next = [this]() { return new IdleState(parent); };
-		tex = t_test_hit;
+		get_next = [this]() { return new IdleState(data); };
+		tex = data->tex_hit;
+		dur = data->dur_hit;
 	}
 };
 struct PunchState : State
 {
 	bool hit = 0;
-	float dmg_v;
-	PunchState(Boxer* parent_, SDL_Texture** tex_ = t_test_punch, float dmg_v_ = .2, hitDir dir = LEFT, float dur_ = .3, hitDir vuln_ = NONE) :
-		State(parent_), dmg_v(dmg_v_)
+	PunchState(StateData* data_) : State(data_)
 	{
-		get_next = [this]() { return new IdleState(parent); };
-		tex = tex_;
-		dmg = dir;
-		dur = dur_;
-		vuln = vuln_;
+		get_next = [this]() { return new IdleState(data); };
 		interruptable = false;
+		dur = data->dur_punch;
+		tex = data->tex_punch;
 	}
 	void update() override
 	{
 		if(hit) return;
-		if(parent->opponent->state->vuln & dmg)
+		if(data->parent->opponent->state->vuln & dmg)
 		{
-			parent->opponent->setState(new HitState(parent->opponent));
+			data->parent->opponent->setState(new HitState(&data->parent->opponent->sd));
 			hit = true;
 		}
 	}
 };
 struct WindupState : State
 {
-	WindupState(Boxer* parent_, float dur_) : State(parent_)
+	WindupState(StateData* data_) : State(data_)
 	{
-		dur = dur_;
-		get_next = [this]() { return new PunchState(parent); };
-		tex = t_test_windup;
+		get_next = [this]() { return new PunchState(data); };
+		dur = data->dur_windup;
+		tex = data->tex_windup;
 	}
 };
 
+struct SwitchingState : State
+{
+	SwitchingState(StateData* data_) : State(data_)
+	{
+		get_next = [this](){ return new IdleState(data); };
+		interruptable = false;
+		tex = t_test_idle;
+	}
+	void update() override
+	{
+		data->parent->pos = cumt::common::lerp(data->parent->pos, cumt::v2f(0,1-2*data->parent->is_player)*.1, completion());
+	}
+	void exit() override
+	{
+		data->parent->is_player = !data->parent->is_player;
+	}
+};

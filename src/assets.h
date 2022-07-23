@@ -28,6 +28,7 @@ inline static SDL_Texture* loadTex(const char* path)
 
 inline Mix_Chunk* sfx_shoot;
 inline SDL_Texture *t_test_idle[2], *t_test_hit[2], *t_test_punch[2], *t_test_windup[2], *t_debug, *t_debug_sided[2];
+inline SDL_Texture *t_test2_idle[2], *t_test2_hit[2], *t_test2_punch[2], *t_test2_windup[2];
 
 inline static void loadAssets()
 {
@@ -48,4 +49,12 @@ inline static void loadAssets()
 	t_test_windup[1] = loadTex("res/test_b_windup.png");
 	t_debug = loadTex("res/debug.png");
 	t_debug_sided[0] = t_debug_sided[1] = t_debug;
+	t_test2_idle[0] = loadTex("res/test2_f_idle.png");
+	t_test2_idle[1] = loadTex("res/test2_b_idle.png");
+	t_test2_punch[0] = loadTex("res/test2_f_punch.png");
+	t_test2_punch[1] = loadTex("res/test2_b_punch.png");
+	t_test2_hit[0] = loadTex("res/test2_f_hit.png");
+	t_test2_hit[1] = loadTex("res/test2_b_hit.png");
+	t_test2_windup[0] = loadTex("res/test2_f_windup.png");
+	t_test2_windup[1] = loadTex("res/test2_b_windup.png");
 }
