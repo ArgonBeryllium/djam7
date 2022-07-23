@@ -1,8 +1,10 @@
 #include <iostream>
 #include <cumt.h>
 #include "assets.h"
+#include "gamemanager.h"
 #include "scenes.h"
 #include "boxer.h"
+#include "scorekeeper.h"
 #include "states.h"
 
 using namespace cumt;
@@ -30,8 +32,8 @@ struct SplashScene : Scene
 struct GameScene : Scene
 {
 	Boxer* a, *b;
-	inline Boxer* getP() { return a->is_player?a:b; }
-	inline Boxer* getO() { return b->is_player?a:b; }
+	inline Boxer* getP() { return GM::player; }
+	inline Boxer* getO() { return GM::opponent; }
 	void load() override
 	{
 		using namespace shitrndr;
@@ -39,10 +41,13 @@ struct GameScene : Scene
 		Thing2D::view_scale = 5;
 		Thing2D::view_pos = {.5, .5};
 
-		a = set.instantiate(new Boxer(true), "boxer A");
-		b = set.instantiate(new Boxer(false), "boxer B");
+		a = set.instantiate(new Boxer(), "boxer A");
+		b = set.instantiate(new Boxer(), "boxer B");
 		a->opponent = b;
 		b->opponent = a;
+
+		a->sd.dur_windup = .1;
+		a->sd.dur_punch = .1;
 
 		b->sd.tex_idle = t_test2_idle;
 		b->sd.tex_punch = t_test2_punch;
@@ -50,6 +55,10 @@ struct GameScene : Scene
 		b->sd.tex_hit = t_test2_hit;
 		b->sd.dur_windup = .5;
 		b->sd.dur_punch = .5;
+		b->sd.dur_hit = .5;
+
+		GM::init(a, b);
+		ScoreKeeper::init();
 	}
 	void unload() override
 	{
@@ -58,16 +67,20 @@ struct GameScene : Scene
 	}
 	void loop() override
 	{
+		GM::update();
 		set.update();
 		set.render();
 		getP()->render();
+		ScoreKeeper::render();
 	}
 	void onKey(SDL_Keycode k) override
 	{
 		switch(k)
 		{
 			case SDLK_z:
-				getP()->setState(new WindupState(&getP()->sd));
+				// TODO find a better way to compare state types
+				if(!dynamic_cast<WindupState*>(getP()->state))
+					getP()->setState(new WindupState(&getP()->sd));
 				break;
 			case SDLK_r:
 				unload();

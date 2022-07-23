@@ -4,6 +4,8 @@
 #include "boxer.h"
 #include "assets.h"
 #include "cumt_common.h"
+#include "gamemanager.h"
+#include "scorekeeper.h"
 
 enum hitDir
 {
@@ -32,7 +34,7 @@ struct State
 
 	virtual void enter() {}
 	virtual void update() {}
-	virtual void exit() {}
+	virtual void exit(State* next) {}
 	virtual void interrupt() {}
 };
 struct IdleState : State
@@ -52,6 +54,19 @@ struct HitState : State
 		get_next = [this]() { return new IdleState(data); };
 		tex = data->tex_hit;
 		dur = data->dur_hit;
+		if(!data->parent->is_player() && ScoreKeeper::getStreak())
+			dur -= .05*ScoreKeeper::getStreak();
+	}
+	void enter() override
+	{
+		if(!data->parent->is_player())
+			ScoreKeeper::punch();
+	}
+	void exit(State* next) override
+	{
+		// TODO find a better way to compare state types
+		if(!dynamic_cast<HitState*>(next) && !data->parent->is_player())
+			ScoreKeeper::finishCombo();
 	}
 };
 struct PunchState : State
@@ -91,14 +106,10 @@ struct SwitchingState : State
 	{
 		get_next = [this](){ return new IdleState(data); };
 		interruptable = false;
-		tex = t_test_idle;
+		tex = data->tex_idle;
 	}
 	void update() override
 	{
-		data->parent->pos = cumt::common::lerp(data->parent->pos, cumt::v2f(0,1-2*data->parent->is_player)*.1, completion());
-	}
-	void exit() override
-	{
-		data->parent->is_player = !data->parent->is_player;
+		data->parent->pos = cumt::common::lerp(data->parent->pos, data->parent->is_player()?GM::spot_p:GM::spot_o, completion());
 	}
 };

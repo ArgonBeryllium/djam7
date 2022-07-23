@@ -24,9 +24,9 @@ struct Boxer : cumt::Thing2D
 	State* state;
 	StateData sd;
 	Boxer* opponent;
-	bool is_player;
+	bool is_player();
 
-	Boxer(bool is_player_ = false);
+	Boxer();
 	virtual ~Boxer();
 
 	bool setState(State* next, bool interrupt = true, bool auto_delete = true);
