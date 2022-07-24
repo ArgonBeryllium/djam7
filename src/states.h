@@ -21,7 +21,7 @@ struct State
 	float remaining() { return dur-t; }
 	float completion() { return t/dur; }
 
-	SDL_Texture** tex = t_debug_sided;
+	ClipPair* cp = cp_debug;
 
 	State(StateData* data_);
 
@@ -44,7 +44,7 @@ struct HitState : State
 {
 	HitState(StateData* data_) : State(data_)
 	{
-		tex = data->tex_hit;
+		cp = data->cp_hit;
 		dur = data->dur_hit;
 		if(!data->parent->is_player() && ScoreKeeper::getStreak())
 			dur -= .05*ScoreKeeper::getStreak();
@@ -69,7 +69,7 @@ struct PunchState : State
 		vuln = NONE;
 		dur = data->dur_punches[dir];
 		dmg = dir;
-		tex = data->tex_punch;
+		cp = data->cp_punch;
 	}
 	void update() override
 	{
@@ -88,7 +88,7 @@ struct WindupState : State
 	{
 		get_next = [this, dir]() { return new PunchState(data, dir); };
 		dur = data->dur_windups[dir];
-		tex = data->tex_windup;
+		cp = data->cp_windup;
 	}
 };
 
@@ -98,7 +98,7 @@ struct DodgeState : State
 	{
 		vuln = dir;
 		dur = data->dur_dodges[dir];
-		tex = t_debug_sided;
+		cp = cp_debug;
 	}
 };
 
@@ -107,7 +107,7 @@ struct SwitchingState : State
 	SwitchingState(StateData* data_) : State(data_)
 	{
 		interruptable = false;
-		tex = data->tex_idle;
+		cp = data->cp_idle;
 	}
 	void update() override
 	{
@@ -120,7 +120,7 @@ struct VictoryState : State
 	VictoryState(StateData* data_) : State(data_)
 	{
 		get_next = [this]() { return new VictoryState(data); };
-		tex = data->tex_victory;
+		cp = data->cp_victory;
 		interruptable = false;
 	}
 };
@@ -129,7 +129,7 @@ struct LossState : State
 	LossState(StateData* data_) : State(data_)
 	{
 		get_next = [this]() { return new LossState(data); };
-		tex = data->tex_loss;
+		cp = data->cp_loss;
 		interruptable = false;
 	}
 };

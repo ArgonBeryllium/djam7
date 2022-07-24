@@ -7,6 +7,7 @@
 #include <cumt_audio.h>
 #include <cumt_logging.h>
 #include <cumt_render.h>
+#include <vector>
 
 inline static Mix_Chunk* loadSFX(const char* path)
 {
@@ -27,20 +28,41 @@ inline static SDL_Texture* loadTex(const char* path)
 	return out;
 }
 
-inline Mix_Chunk* sfx_shoot;
-inline SDL_Texture *t_test_idle[2], *t_test_hit[2], *t_test_punch[2], *t_test_windup[2], *t_debug, *t_debug_sided[2];
-inline SDL_Texture *t_test2_idle[2], *t_test2_hit[2], *t_test2_punch[2], *t_test2_windup[2];
-
 struct Clip
 {
-	size_t n_frames;
-	SDL_Texture** frames;
+	std::vector<SDL_Texture*> frames;
 
 	inline SDL_Texture* getFrame(float f)
 	{
-		return frames[size_t(std::round(f*n_frames))];
+		return frames[std::min(frames.size()-1, std::max(size_t(0), size_t(std::round(f*frames.size()))))];
 	}
 };
+struct ClipPair
+{
+	Clip* front, *back;
+	Clip* operator[](const size_t& index) { return getClip(index); }
+	Clip* getClip(const size_t& index) { return index?back:front; }
+};
+
+inline static Clip* loadClip(const char* path_start, size_t frames, size_t start_frame = 1, const char* extension = "png")
+{
+	Clip* out = new Clip;
+	for(size_t i = start_frame; i != start_frame+frames; i++)
+		out->frames.push_back(loadTex((std::string(path_start)+std::to_string(i)+"."+extension).c_str()));
+	return out;
+}
+inline static ClipPair* loadClipPair(const char* path_start, size_t frames, size_t start_frame = 1, const char* extension = "png")
+{
+	ClipPair* out = new ClipPair;
+	out->front = loadClip((std::string(path_start)+"_f_").c_str(), frames, start_frame, extension);
+	out->back =  loadClip((std::string(path_start)+"_b_").c_str(), frames, start_frame, extension);
+	return out;
+}
+
+inline Mix_Chunk* sfx_shoot;
+inline SDL_Texture* t_debug;
+inline ClipPair *cp_test_idle, *cp_test_hit, *cp_test_punch, *cp_test_windup, *cp_debug;
+inline ClipPair *cp_test2_idle, *cp_test2_hit, *cp_test2_punch, *cp_test2_windup;
 
 inline static void loadAssets()
 {
@@ -51,22 +73,17 @@ inline static void loadAssets()
 	sfx_shoot = loadSFX("res/test.wav");
 	RenderData::loadFont("res/m6x11.ttf", 22);
 
-	t_test_idle[0] = loadTex("res/test_f_idle.png");
-	t_test_idle[1] = loadTex("res/test_b_idle.png");
-	t_test_punch[0] = loadTex("res/test_f_punch.png");
-	t_test_punch[1] = loadTex("res/test_b_punch.png");
-	t_test_hit[0] = loadTex("res/test_f_hit.png");
-	t_test_hit[1] = loadTex("res/test_b_hit.png");
-	t_test_windup[0] = loadTex("res/test_f_windup.png");
-	t_test_windup[1] = loadTex("res/test_b_windup.png");
 	t_debug = loadTex("res/debug.png");
-	t_debug_sided[0] = t_debug_sided[1] = t_debug;
-	t_test2_idle[0] = loadTex("res/test2_f_idle.png");
-	t_test2_idle[1] = loadTex("res/test2_b_idle.png");
-	t_test2_punch[0] = loadTex("res/test2_f_punch.png");
-	t_test2_punch[1] = loadTex("res/test2_b_punch.png");
-	t_test2_hit[0] = loadTex("res/test2_f_hit.png");
-	t_test2_hit[1] = loadTex("res/test2_b_hit.png");
-	t_test2_windup[0] = loadTex("res/test2_f_windup.png");
-	t_test2_windup[1] = loadTex("res/test2_b_windup.png");
+	Clip* debug_clip = new Clip();
+	debug_clip->frames.push_back(t_debug);
+	cp_debug = new ClipPair{debug_clip, debug_clip};
+
+	cp_test_idle =   loadClipPair("res/test", 1, 1);
+	cp_test_punch =  loadClipPair("res/test", 6, 7);
+	cp_test_hit =    loadClipPair("res/test", 12, 18);
+	cp_test_windup = loadClipPair("res/test", 7, 1);
+	cp_test2_idle =   loadClipPair("res/test2", 1, 1);
+	cp_test2_punch =  loadClipPair("res/test2", 6, 7);
+	cp_test2_hit =    loadClipPair("res/test2", 12, 18);
+	cp_test2_windup = loadClipPair("res/test2", 7, 1);
 }

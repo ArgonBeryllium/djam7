@@ -43,17 +43,17 @@ struct GameScene : Scene
 		Thing2D::view_pos = {.5, .5};
 
 		a = set.instantiate(new Boxer(), "boxer A");
-		b = set.instantiate(new Boxer(t_test2_idle), "boxer B");
+		b = set.instantiate(new Boxer(cp_test2_idle), "boxer B");
 		a->opponent = b;
 		b->opponent = a;
 
 		a->sd.dur_windups[LEFT] = .2;
 		a->sd.dur_punches[LEFT] = .1;
 
-		b->sd.tex_idle = t_test2_idle;
-		b->sd.tex_punch = t_test2_punch;
-		b->sd.tex_windup = t_test2_windup;
-		b->sd.tex_hit = t_test2_hit;
+		b->sd.cp_idle = cp_test2_idle;
+		b->sd.cp_punch = cp_test2_punch;
+		b->sd.cp_windup = cp_test2_windup;
+		b->sd.cp_hit = cp_test2_hit;
 		b->sd.dur_windups[LEFT] = .5;
 		b->sd.dur_punches[LEFT] = .2;
 		b->sd.dur_hit = .7;

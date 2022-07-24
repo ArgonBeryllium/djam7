@@ -7,7 +7,7 @@
 # important
 ## 1h
 - [x] left/right punches & windups & hits
-- [ ] replace Texture** with Clips
+- [x] replace Texture** with Clips
 ## 30m
 - [x] introduce differentiation between being hit and other interrupts (act(), acting bool unset by Idle?)
 ## 30m

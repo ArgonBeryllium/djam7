@@ -7,10 +7,10 @@
 
 using namespace cumt;
 
-Boxer::Boxer(SDL_Texture** tex_idle_) : health(max_health)
+Boxer::Boxer(ClipPair* cp_idle_) : health(max_health)
 {
 	sd.parent = this;
-	sd.tex_idle = tex_idle_;
+	sd.cp_idle = cp_idle_;
 	state = new IdleState(&sd);
 }
 Boxer::~Boxer()
@@ -87,7 +87,7 @@ void Boxer::update()
 void Boxer::render()
 {
 	using namespace shitrndr;
-	Copy(state->tex[is_player()], getRect());
+	Copy(state->cp->getClip(is_player())->getFrame(state->completion()), getRect());
 	SDL_Rect r = getRect();
 	r.h /= 10;
 	r.w *= health;

@@ -23,12 +23,12 @@ struct StateData
 
 	float strength = .1;
 
-	SDL_Texture** tex_idle    = t_test_idle;
-	SDL_Texture** tex_windup  = t_test_windup;
-	SDL_Texture** tex_hit     = t_test_hit;
-	SDL_Texture** tex_punch   = t_test_punch;
-	SDL_Texture** tex_victory = t_debug_sided;
-	SDL_Texture** tex_loss    = t_debug_sided;
+	ClipPair* cp_idle    = cp_test_idle;
+	ClipPair* cp_windup  = cp_test_windup;
+	ClipPair* cp_hit     = cp_test_hit;
+	ClipPair* cp_punch   = cp_test_punch;
+	ClipPair* cp_victory = cp_debug;
+	ClipPair* cp_loss    = cp_debug;
 };
 struct Boxer : cumt::Thing2D
 {
@@ -46,7 +46,7 @@ struct Boxer : cumt::Thing2D
 	bool setState(State* next, bool interrupt = true, bool auto_delete = true);
 	void forceState(State* next, bool interrupt = true);
 
-	Boxer(SDL_Texture** tex_idle_ = t_test_idle);
+	Boxer(ClipPair* cp_idle_ = cp_test_idle);
 	virtual ~Boxer();
 
 	virtual State* pickAction();
