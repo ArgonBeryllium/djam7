@@ -34,6 +34,10 @@ struct State
 struct IdleState : State
 {
 	IdleState(StateData* data_);
+	void enter() override
+	{
+		data->parent->acting = false;
+	}
 };
 
 struct HitState : State
@@ -62,7 +66,7 @@ struct PunchState : State
 	bool hit = 0;
 	PunchState(StateData* data_, hitDir dir = LEFT) : State(data_)
 	{
-		interruptable = data->parent->is_player();
+		vuln = NONE;
 		dur = data->dur_punches[dir];
 		dmg = dir;
 		tex = data->tex_punch;

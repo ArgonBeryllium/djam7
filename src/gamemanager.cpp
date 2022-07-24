@@ -31,8 +31,8 @@ void GM::update()
 {
 	if(swap)
 	{
-		player->setState(new SwitchingState(&player->sd), false);
-		opponent->setState(new SwitchingState(&opponent->sd), false);
+		player->forceState(new SwitchingState(&player->sd));
+		opponent->forceState(new SwitchingState(&opponent->sd));
 		std::swap(player, opponent);
 		swap = false;
 	}
@@ -51,6 +51,6 @@ void GM::finishRound(Boxer *loser_)
 {
 	is_finished = true;
 	loser = loser_;
-	loser->setState(new LossState(&loser->sd), false);
-	loser->opponent->setState(new VictoryState(&loser->sd), false);
+	loser->forceState(new LossState(&loser->sd));
+	loser->opponent->forceState(new VictoryState(&loser->sd));
 }

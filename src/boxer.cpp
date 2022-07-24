@@ -1,3 +1,4 @@
+#include <stack>
 #include "boxer.h"
 #include "cumt_common.h"
 #include "gamemanager.h"
@@ -6,7 +7,7 @@
 
 using namespace cumt;
 
-Boxer::Boxer(SDL_Texture** tex_idle_)
+Boxer::Boxer(SDL_Texture** tex_idle_) : health(max_health)
 {
 	sd.parent = this;
 	sd.tex_idle = tex_idle_;
@@ -29,7 +30,14 @@ void Boxer::knockOut()
 	GM::finishRound(this);
 }
 
-static State* to_delete = nullptr;
+bool Boxer::act(State* next)
+{
+	if(acting) return false;
+	acting = true;
+	return setState(next);
+}
+
+static std::stack<State*> to_delete;
 bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 {
 	if(interrupt && !state->interruptable)
@@ -41,11 +49,19 @@ bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 	if(interrupt) state->interrupt();
 
 	state->exit(next);
-	to_delete = state;
+	to_delete.push(state);
 	state = next;
 	state->enter();
 
 	return true;
+}
+void Boxer::forceState(State *next, bool interrupt)
+{
+	if(interrupt) state->interrupt();
+	state->exit(next);
+	to_delete.push(state);
+	state = next;
+	state->enter();
 }
 
 State* Boxer::pickAction()
@@ -57,17 +73,16 @@ State* Boxer::pickAction()
 
 void Boxer::update()
 {
-	if(to_delete)
+	while(!to_delete.empty())
 	{
-		delete to_delete;
-		to_delete = nullptr;
+		State* s = to_delete.top();
+		to_delete.pop();
+		delete s;
 	}
 	state->update();
 	state->t += FD::delta;
 	if(state->t>=state->dur)
-	{
 		setState(state->get_next(), false);
-	}
 }
 void Boxer::render()
 {

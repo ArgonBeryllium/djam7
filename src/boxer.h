@@ -37,15 +37,19 @@ struct Boxer : cumt::Thing2D
 	Boxer* opponent;
 	bool is_player();
 
-	float health = 1;
+	float max_health = 1, health;
 	void takeDamage(float dmg);
 	virtual void knockOut();
+
+	bool acting = false;
+	bool act(State* next);
+	bool setState(State* next, bool interrupt = true, bool auto_delete = true);
+	void forceState(State* next, bool interrupt = true);
 
 	Boxer(SDL_Texture** tex_idle_ = t_test_idle);
 	virtual ~Boxer();
 
 	virtual State* pickAction();
-	bool setState(State* next, bool interrupt = true, bool auto_delete = true);
 	void render() override;
 	void update() override;
 };

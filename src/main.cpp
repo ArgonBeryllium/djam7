@@ -96,26 +96,26 @@ struct GameScene : Scene
 		}
 		if(GM::finished()) return;
 		// TODO find a better way to compare state types
-		if(!dynamic_cast<IdleState*>(getP()->state)) return;
+		//if(!dynamic_cast<IdleState*>(getP()->state)) return;
 		switch(k)
 		{
 			case SDLK_z:
-					getP()->setState(new WindupState(&getP()->sd, LEFT));
+					getP()->act(new WindupState(&getP()->sd, LEFT));
 				break;
 			case SDLK_x:
-					getP()->setState(new WindupState(&getP()->sd, RIGHT));
+					getP()->act(new WindupState(&getP()->sd, RIGHT));
 				break;
 			case SDLK_LEFT:
 			case SDLK_a:
-				getP()->setState(new DodgeState(&getP()->sd, LEFT));
+				getP()->act(new DodgeState(&getP()->sd, LEFT));
 				break;
 			case SDLK_RIGHT:
 			case SDLK_d:
-				getP()->setState(new DodgeState(&getP()->sd, RIGHT));
+				getP()->act(new DodgeState(&getP()->sd, RIGHT));
 				break;
 			case SDLK_DOWN:
 			case SDLK_s:
-				getP()->setState(new DodgeState(&getP()->sd, BACK));
+				getP()->act(new DodgeState(&getP()->sd, BACK));
 				break;
 			default: break;
 		}
