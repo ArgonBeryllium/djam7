@@ -4,6 +4,7 @@
 #include "scenes.h"
 #include "boxer.h"
 #include "scorekeeper.h"
+#include "shitrndr/src/shitrndr.h"
 #include "states.h"
 
 using namespace cumt;
@@ -19,7 +20,7 @@ struct SplashScene : Scene
 	void loop() override
 	{
 		set.update();
-		render::text(shitrndr::WindowProps::getSize()/2+v2i(std::cos(FD::time*14.1)*5-50, std::sin(FD::time*3)*15), "ArBe game :)");
+		render::text(shitrndr::WindowProps::getSize()/2+v2i(std::cos(FD::time*14.1)*5-50, std::sin(FD::time*3)*15), "almost a game, by ArBe");
 	}
 	void onKey(SDL_Keycode k) override
 	{
@@ -30,7 +31,7 @@ struct SplashScene : Scene
 
 struct Player : Boxer
 {
-	Player()
+	Player() : Boxer(cp_p_idle)
 	{
 		sd.cp_idle = cp_p_idle;
 		sd.cp_hits = {{LEFT, cp_p_hit_l}, {RIGHT, cp_p_hit_r}};
@@ -41,9 +42,96 @@ struct Player : Boxer
 		sd.cp_stumble = cp_p_stumble;
 		sd.cp_loss = cp_p_lose;
 		sd.cp_victory = cp_p_win;
+
+		sd.dur_windups[LEFT] = .2;
+		sd.dur_windups[RIGHT] = .2;
+	}
+};
+struct TutorialPlayer : Player
+{
+	TutorialPlayer()
+	{
+		opponent = this;
+	}
+	void takeDamage(float dmg) override {}
+};
+struct Opp1 : Boxer
+{
+	Opp1() : Boxer(cp_o_idle)
+	{
+		sd.cp_idle = cp_o_idle;
+		sd.cp_hits = {{LEFT, cp_o_hit_l}, {RIGHT, cp_o_hit_r}};
+		sd.cp_punches = {{LEFT, cp_o_punch_l}, {RIGHT, cp_o_punch_r}};
+		sd.cp_windups = {{LEFT, cp_o_windup_l}, {RIGHT, cp_o_windup_r}};
+		sd.cp_winddowns = {{LEFT, cp_o_winddown_l}, {RIGHT, cp_o_winddown_r}};
+		sd.cp_dodges = {{LEFT, cp_o_dodge_l}, {BACK, cp_o_dodge_b}, {RIGHT, cp_o_dodge_r}};
+		sd.cp_stumble = cp_o_stumble;
+		sd.cp_loss = cp_o_lose;
+		sd.cp_victory = cp_o_win;
+
+		sd.dur_windups[LEFT] = .5;
+		sd.dur_windups[RIGHT] = .25;
+		sd.dur_winddowns[LEFT] = .3;
+		sd.dur_winddowns[RIGHT] = .6;
+		sd.dur_hit = .7;
+		sd.strength = .15;
 	}
 };
 
+struct MenuScene : Scene
+{
+	TutorialPlayer* tp;
+	void load() override
+	{
+		shitrndr::bg_col = COL_BG;
+		Thing2D::view_scale = 6;
+		Thing2D::view_pos = {.5, .5};
+		tp = set.instantiate(new TutorialPlayer);
+		GM::init(tp, tp);
+	}
+	void loop() override
+	{
+		using namespace shitrndr;
+		render::text(v2f(0.5,.2)*WindowProps::getSize(), "MODULO SWAP", *td_c);
+		render::text(v2f(0.5,.3)*WindowProps::getSize(), "Every time you have an odd-numbered combo, you swap with your opponent.", *td_c);
+		render::text(v2f(0.5,.35)*WindowProps::getSize(), "Alternating punches get more points.", *td_c);
+		render::text(v2f(0.5,.6)*WindowProps::getSize(), "[Z] and [X] to PUNCH", *td_c);
+		render::text(v2f(0.5,.65)*WindowProps::getSize(), "arrow keys to DODGE", *td_c);
+		render::text(v2f(0.5,.7)*WindowProps::getSize(), "[ESC] or [Q] to QUIT", *td_c);
+		render::text(v2f(0.5,.8)*WindowProps::getSize(), "[SPACE] to CONTINUE", *td_c);
+		set.render();
+		set.update();
+	}
+	void onKey(SDL_Keycode k) override
+	{
+		switch(k)
+		{
+			case SDLK_z:
+					tp->act(new WindupState(&tp->sd, LEFT));
+				break;
+			case SDLK_x:
+					tp->act(new WindupState(&tp->sd, RIGHT));
+				break;
+			case SDLK_LEFT:
+			case SDLK_a:
+				tp->act(new DodgeState(&tp->sd, LEFT));
+				break;
+			case SDLK_RIGHT:
+			case SDLK_d:
+				tp->act(new DodgeState(&tp->sd, RIGHT));
+				break;
+			case SDLK_DOWN:
+			case SDLK_s:
+				tp->act(new DodgeState(&tp->sd, BACK));
+				break;
+			case SDLK_SPACE:
+				if(nactive==index)
+					Scene::setActive(index+1);
+				break;
+			default: break;
+		}
+	}
+};
 struct GameScene : Scene
 {
 	Boxer* a, *b;
@@ -57,17 +145,9 @@ struct GameScene : Scene
 		Thing2D::view_pos = {.5, .5};
 
 		a = set.instantiate(new Player(), "boxer A");
-		b = set.instantiate(new Boxer(cp_test2_idle), "boxer B");
+		b = set.instantiate(new Opp1(), "boxer B");
 		a->opponent = b;
 		b->opponent = a;
-
-		a->sd.dur_windups[LEFT] = .2;
-		a->sd.dur_punches[LEFT] = .1;
-
-		b->sd.cp_idle = cp_test2_idle;
-		b->sd.dur_windups[LEFT] = .5;
-		b->sd.dur_punches[LEFT] = .2;
-		b->sd.dur_hit = .7;
 
 		GM::init(a, b);
 		ScoreKeeper::init();
@@ -88,6 +168,16 @@ struct GameScene : Scene
 			Copy(c_bgr->getFrame(SwitchingState::instance->completion()), WindowProps::getSizeRect());
 		set.render();
 		getP()->render();
+
+		int W = WindowProps::getWidth(), H = WindowProps::getHeight();
+		SetColour({0,0,0,255});
+		FillRect({0,0,W, H/16});
+		SetColour({255,255,255,255});
+		DrawRect({W/8,    H/64,W/4, H/32});
+		DrawRect({W/8+W/2,H/64,W/4, H/32});
+		FillRect({W/8,    H/64,int(W/4*getP()->health/getP()->max_health), H/32});
+		FillRect({W/8+W/2,H/64,int(W/4*getO()->health/getO()->max_health), H/32});
+
 		ScoreKeeper::render();
 		GM::render();
 	}
@@ -95,19 +185,19 @@ struct GameScene : Scene
 	{
 		switch(k)
 		{
-			case SDLK_p:
-				getP()->takeDamage(getP()->health);
-				break;
-			case SDLK_o:
-				getO()->takeDamage(getO()->health);
-				break;
+			//case SDLK_p:
+			//	getP()->takeDamage(getP()->health);
+			//	break;
+			//case SDLK_o:
+			//	getO()->takeDamage(getO()->health);
+			//	break;
 			case SDLK_r:
 				unload();
 				load();
 				break;
-			case SDLK_SPACE:
-				GM::prepSwap();
-				break;
+			//case SDLK_SPACE:
+			//	GM::prepSwap();
+			//	break;
 			default: break;
 		}
 		if(GM::finished()) return;
@@ -142,7 +232,7 @@ void gameSetup()
 {
 	using namespace shitrndr;
 	WindowProps::setLockType(shitrndr::WindowProps::BARS);
-	Scene::scenes = {new SplashScene, new GameScene};
+	Scene::scenes = {new SplashScene, new MenuScene, new GameScene};
 	Scene::init();
 
 	loadAssets();

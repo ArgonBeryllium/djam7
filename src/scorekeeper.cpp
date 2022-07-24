@@ -2,6 +2,7 @@
 #include "boxer.h"
 #include "cumt_render.h"
 #include "gamemanager.h"
+#include "shitrndr/src/shitrndr.h"
 #include <string>
 
 int ScoreKeeper::score = 0;
@@ -30,6 +31,6 @@ void ScoreKeeper::render()
 	using namespace cumt;
 	if(streak)
 		render::text(Thing2D::spaceToScr(GM::spot_p+v2f(.5+(streak%2?-.5:.5), streak*.1)), std::to_string(streak)+(streak%2?"!":" :)"));
-	render::text({0, 0}, std::to_string(score));
+	render::text(v2f(.5, 1./64)*shitrndr::WindowProps::getSize(), std::to_string(score), *td_c);
 }
 int ScoreKeeper::getStreak() { return streak; }

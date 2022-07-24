@@ -1,4 +1,5 @@
 #include "gamemanager.h"
+#include "assets.h"
 #include "shitrndr/src/shitrndr.h"
 #include "states.h"
 using namespace cumt;
@@ -47,10 +48,13 @@ void GM::render()
 	if(is_finished)
 	{
 		setFreeze();
+		SDL_Rect r = shitrndr::WindowProps::getSizeRect();
 		if(playerWon())
-			render::text(shitrndr::WindowProps::getSize()/2, "win :)");
+			render::text(shitrndr::WindowProps::getSize()/2, "You Win!", *td_ca);
 		else
-			render::text(shitrndr::WindowProps::getSize()/2, "lmao L");
+			render::text(shitrndr::WindowProps::getSize()/2, "You Lost.", *td_ca);
+		render::text(v2f(.5, .6)*shitrndr::WindowProps::getSize(), "[R] to RESTART", *td_ca);
+		render::text(v2f(.5, .65)*shitrndr::WindowProps::getSize(), "[Q] or [ESC] to QUIT", *td_ca);
 	}
 }
 void GM::finishRound(Boxer *loser_)
@@ -59,5 +63,5 @@ void GM::finishRound(Boxer *loser_)
 	setFreeze();
 	loser = loser_;
 	loser->forceState(new LossState(&loser->sd));
-	loser->opponent->forceState(new VictoryState(&loser->sd));
+	loser->opponent->forceState(new VictoryState(&loser->opponent->sd));
 }

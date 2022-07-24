@@ -94,12 +94,15 @@ struct PunchState : State
 	}
 	void exit(State* next) override
 	{
+		// was causing a bug in the final hour of the jam :)
+		/*
 		if(!hit && data->parent->is_player())
 		{
 			// takeDamage may call setState, which calls this function, so I'm reusing hit as a loop guard
 			hit = true;
-			data->parent->takeDamage(.05);
+			data->parent->takeDamage(.5);
 		}
+		*/
 	}
 };
 struct WindupState : State
@@ -112,13 +115,20 @@ struct WindupState : State
 	}
 };
 
+inline hitDir getCompliment(hitDir d)
+{
+	if(d==LEFT) return RIGHT;
+	if(d==RIGHT) return LEFT;
+	if(d==BACK) return NONE;
+	return BACK;
+}
 struct DodgeState : State
 {
 	DodgeState(StateData* data_, const hitDir& dir) : State(data_)
 	{
-		vuln = dir;
+		vuln = getCompliment(dir);
 		dur = data->dur_dodges[dir];
-		cp = cp_debug;
+		cp = data->cp_dodges[dir];
 	}
 };
 

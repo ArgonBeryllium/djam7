@@ -11,11 +11,14 @@
 - [x] K/Os
 - [x] main character art
 - [x] background art
-- [ ] opponent #1
-	- [ ] sprites
-	- [ ] values
-- [ ] main menu
-- [ ] proper health bars
+- [x] opponent #1
+	- [x] sprites
+- [x] balance values
+- [x] main menu
+- [x] proper health bars
+- [x] fix end sprite bug
+- [x] fix other sprite bug
+- [~] fix suicide hang bug
 
 # nice
 - [ ] combo dialogue fx

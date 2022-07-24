@@ -24,7 +24,7 @@ void Boxer::takeDamage(float dmg)
 {
 	health -= dmg;
 	if(health<=0)
-		setState(new StumbleState(&sd));
+		forceState(new StumbleState(&sd));
 }
 std::function<State*()> Boxer::getKnockOutResult()
 {
@@ -91,9 +91,4 @@ void Boxer::render()
 {
 	using namespace shitrndr;
 	Copy(state->cp->getClip(is_player())->getFrame(state->completion()), getRect());
-	SDL_Rect r = getRect();
-	r.h /= 10;
-	r.w *= health;
-	SetColour({0,255,0,255});
-	FillRect(r);
 }

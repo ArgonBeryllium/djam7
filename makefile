@@ -1,7 +1,7 @@
 CXX=clang++
 LIBS=-lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf\
 	 -I $(LIBCUMT) -I $(CUMT_DIR)/src/
-CXXFLAGS=--std=c++17 -g
+CXXFLAGS=--std=c++17 -O3
 
 BIN_DIR=bin
 TEST_SRC=$(wildcard src/*.cpp)

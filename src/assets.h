@@ -59,21 +59,27 @@ inline static ClipPair* loadClipPair(const char* path_start, size_t frames, size
 	return out;
 }
 
-inline Mix_Chunk* sfx_shoot;
 inline SDL_Texture* t_debug, *t_bg;
 inline Clip *c_bgr;
 inline ClipPair *cp_test_idle, *cp_test_hit, *cp_test_punch, *cp_test_windup, *cp_debug;
 inline ClipPair *cp_test2_idle, *cp_test2_hit, *cp_test2_punch, *cp_test2_windup;
 inline ClipPair *cp_p_idle, *cp_p_hit_r, *cp_p_hit_l, *cp_p_winddown_l, *cp_p_winddown_r, *cp_p_windup_l, *cp_p_windup_r, *cp_p_punch_l, *cp_p_punch_r, *cp_p_dodge_l, *cp_p_dodge_b, *cp_p_dodge_r, *cp_p_win, *cp_p_stumble, *cp_p_lose;
+inline ClipPair *cp_o_idle, *cp_o_hit_r, *cp_o_hit_l, *cp_o_winddown_l, *cp_o_winddown_r, *cp_o_windup_l, *cp_o_windup_r, *cp_o_punch_l, *cp_o_punch_r, *cp_o_dodge_l, *cp_o_dodge_b, *cp_o_dodge_r, *cp_o_win, *cp_o_stumble, *cp_o_lose;
+inline cumt::render::TextData* td_c, *td_ca;
+inline const SDL_Colour COL_BG = {04, 23, 37, 255};
 
 inline static void loadAssets()
 {
 	using namespace cumt;
-	cumt::audio::init();
 	cumt::RenderData::initTTF();
 
-	sfx_shoot = loadSFX("res/test.wav");
 	RenderData::loadFont("res/m6x11.ttf", 22);
+
+	td_c = new render::TextData;
+	td_c->anchor = render::TextData::CENTRE;
+	td_ca = new render::TextData;
+	td_ca->anchor = render::TextData::CENTRE;
+	td_ca->col = COL_BG;
 
 	t_bg = loadTex("res/bg_rotate_1.png");
 	t_debug = loadTex("res/debug.png");
@@ -110,5 +116,25 @@ inline static void loadAssets()
 
 	cp_p_stumble  = loadClipPair("res/player", 41, 109);
 	cp_p_lose    = loadClipPair("res/player", 14, 150);
-	cp_p_win     = loadClipPair("res/player", 28, 165);
+	cp_p_win     = loadClipPair("res/player", 17, 165);
+
+	cp_o_idle = loadClipPair("res/opp", 9);
+
+	cp_o_windup_l   = loadClipPair("res/opp", 6, 10);
+	cp_o_punch_l    = loadClipPair("res/opp", 6, 16);
+	cp_o_winddown_l = loadClipPair("res/opp", 5, 22);
+
+	cp_o_windup_r   = loadClipPair("res/opp", 6, 27);
+	cp_o_punch_r    = loadClipPair("res/opp", 6, 33);
+	cp_o_winddown_r = loadClipPair("res/opp", 5, 39);
+
+	cp_o_dodge_l = loadClipPair("res/opp", 12, 44);
+	cp_o_dodge_r = loadClipPair("res/opp", 11, 56);
+	cp_o_dodge_b = loadClipPair("res/opp", 11, 65);
+	cp_o_hit_r   = loadClipPair("res/opp", 15, 78);
+	cp_o_hit_l   = loadClipPair("res/opp", 15, 93);
+
+	cp_o_stumble  = loadClipPair("res/opp", 41, 109);
+	cp_o_lose    = loadClipPair("res/opp", 14, 150);
+	cp_o_win     = loadClipPair("res/opp", 17, 165);
 }

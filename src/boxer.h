@@ -43,7 +43,7 @@ struct Boxer : cumt::Thing2D
 	bool is_player();
 
 	float max_health = 1, health;
-	void takeDamage(float dmg);
+	virtual void takeDamage(float dmg);
 	virtual std::function<State*()> getKnockOutResult();
 
 	bool acting = false;
