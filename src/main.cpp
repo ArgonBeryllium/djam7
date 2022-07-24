@@ -1,5 +1,3 @@
-#include <SDL2/SDL_keycode.h>
-#include <iostream>
 #include <cumt.h>
 #include "assets.h"
 #include "gamemanager.h"
@@ -30,6 +28,22 @@ struct SplashScene : Scene
 	}
 };
 
+struct Player : Boxer
+{
+	Player()
+	{
+		sd.cp_idle = cp_p_idle;
+		sd.cp_hits = {{LEFT, cp_p_hit_l}, {RIGHT, cp_p_hit_r}};
+		sd.cp_punches = {{LEFT, cp_p_punch_l}, {RIGHT, cp_p_punch_r}};
+		sd.cp_windups = {{LEFT, cp_p_windup_l}, {RIGHT, cp_p_windup_r}};
+		sd.cp_winddowns = {{LEFT, cp_p_winddown_l}, {RIGHT, cp_p_winddown_r}};
+		sd.cp_dodges = {{LEFT, cp_p_dodge_l}, {BACK, cp_p_dodge_b}, {RIGHT, cp_p_dodge_r}};
+		sd.cp_stumble = cp_p_stumble;
+		sd.cp_loss = cp_p_lose;
+		sd.cp_victory = cp_p_win;
+	}
+};
+
 struct GameScene : Scene
 {
 	Boxer* a, *b;
@@ -42,7 +56,7 @@ struct GameScene : Scene
 		Thing2D::view_scale = 8;
 		Thing2D::view_pos = {.5, .5};
 
-		a = set.instantiate(new Boxer(), "boxer A");
+		a = set.instantiate(new Player(), "boxer A");
 		b = set.instantiate(new Boxer(cp_test2_idle), "boxer B");
 		a->opponent = b;
 		b->opponent = a;
@@ -51,9 +65,6 @@ struct GameScene : Scene
 		a->sd.dur_punches[LEFT] = .1;
 
 		b->sd.cp_idle = cp_test2_idle;
-		b->sd.cp_punch = cp_test2_punch;
-		b->sd.cp_windup = cp_test2_windup;
-		b->sd.cp_hit = cp_test2_hit;
 		b->sd.dur_windups[LEFT] = .5;
 		b->sd.dur_punches[LEFT] = .2;
 		b->sd.dur_hit = .7;
@@ -70,6 +81,11 @@ struct GameScene : Scene
 	{
 		GM::update();
 		set.update();
+
+		using namespace shitrndr;
+		Copy(t_bg, WindowProps::getSizeRect());
+		if(SwitchingState::instance)
+			Copy(c_bgr->getFrame(SwitchingState::instance->completion()), WindowProps::getSizeRect());
 		set.render();
 		getP()->render();
 		ScoreKeeper::render();

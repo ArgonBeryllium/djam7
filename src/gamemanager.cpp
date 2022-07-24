@@ -4,7 +4,7 @@
 using namespace cumt;
 
 Boxer* GM::player, *GM::opponent;
-v2f GM::spot_p = {0,.2}, GM::spot_o = {0, -.2};
+v2f GM::spot_p = {0,.4}, GM::spot_o = {0, 0};
 static Boxer* op;
 
 static bool swap = false, is_finished = false, freeze = false;
@@ -46,6 +46,7 @@ void GM::render()
 {
 	if(is_finished)
 	{
+		setFreeze();
 		if(playerWon())
 			render::text(shitrndr::WindowProps::getSize()/2, "win :)");
 		else

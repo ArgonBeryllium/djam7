@@ -60,9 +60,11 @@ inline static ClipPair* loadClipPair(const char* path_start, size_t frames, size
 }
 
 inline Mix_Chunk* sfx_shoot;
-inline SDL_Texture* t_debug;
+inline SDL_Texture* t_debug, *t_bg;
+inline Clip *c_bgr;
 inline ClipPair *cp_test_idle, *cp_test_hit, *cp_test_punch, *cp_test_windup, *cp_debug;
 inline ClipPair *cp_test2_idle, *cp_test2_hit, *cp_test2_punch, *cp_test2_windup;
+inline ClipPair *cp_p_idle, *cp_p_hit_r, *cp_p_hit_l, *cp_p_winddown_l, *cp_p_winddown_r, *cp_p_windup_l, *cp_p_windup_r, *cp_p_punch_l, *cp_p_punch_r, *cp_p_dodge_l, *cp_p_dodge_b, *cp_p_dodge_r, *cp_p_win, *cp_p_stumble, *cp_p_lose;
 
 inline static void loadAssets()
 {
@@ -73,10 +75,13 @@ inline static void loadAssets()
 	sfx_shoot = loadSFX("res/test.wav");
 	RenderData::loadFont("res/m6x11.ttf", 22);
 
+	t_bg = loadTex("res/bg_rotate_1.png");
 	t_debug = loadTex("res/debug.png");
 	Clip* debug_clip = new Clip();
 	debug_clip->frames.push_back(t_debug);
 	cp_debug = new ClipPair{debug_clip, debug_clip};
+
+	c_bgr = loadClip("res/bg_rotate_", 10);
 
 	cp_test_idle =   loadClipPair("res/test", 1, 1);
 	cp_test_punch =  loadClipPair("res/test", 6, 7);
@@ -86,4 +91,24 @@ inline static void loadAssets()
 	cp_test2_punch =  loadClipPair("res/test2", 6, 7);
 	cp_test2_hit =    loadClipPair("res/test2", 12, 18);
 	cp_test2_windup = loadClipPair("res/test2", 7, 1);
+
+	cp_p_idle = loadClipPair("res/player", 9);
+
+	cp_p_windup_l   = loadClipPair("res/player", 6, 10);
+	cp_p_punch_l    = loadClipPair("res/player", 6, 16);
+	cp_p_winddown_l = loadClipPair("res/player", 5, 22);
+
+	cp_p_windup_r   = loadClipPair("res/player", 6, 27);
+	cp_p_punch_r    = loadClipPair("res/player", 6, 33);
+	cp_p_winddown_r = loadClipPair("res/player", 5, 39);
+
+	cp_p_dodge_l = loadClipPair("res/player", 12, 44);
+	cp_p_dodge_r = loadClipPair("res/player", 11, 56);
+	cp_p_dodge_b = loadClipPair("res/player", 11, 65);
+	cp_p_hit_r   = loadClipPair("res/player", 15, 78);
+	cp_p_hit_l   = loadClipPair("res/player", 15, 93);
+
+	cp_p_stumble  = loadClipPair("res/player", 41, 109);
+	cp_p_lose    = loadClipPair("res/player", 14, 150);
+	cp_p_win     = loadClipPair("res/player", 28, 165);
 }

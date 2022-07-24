@@ -1,10 +1,12 @@
 #include "scorekeeper.h"
+#include "boxer.h"
 #include "cumt_render.h"
 #include "gamemanager.h"
 #include <string>
 
 int ScoreKeeper::score = 0;
 static int streak = 0;
+static hitDir lastd = NONE;
 void ScoreKeeper::init()
 {
 	score = 0;
@@ -12,12 +14,14 @@ void ScoreKeeper::init()
 }
 void ScoreKeeper::finishCombo()
 {
+	lastd = NONE;
 	if(streak%2 != 0)
 		GM::prepSwap();
 	streak = 0;
 }
-void ScoreKeeper::punch()
+void ScoreKeeper::punch(hitDir dir)
 {
+	if(dir != lastd) score += 50;
 	streak++;
 	score += 100*streak;
 }

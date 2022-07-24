@@ -21,13 +21,16 @@ struct StateData
 	std::map<hitDir, float> dur_dodges = {{LEFT, .4}, {BACK, .2}, {RIGHT, .4}};
 	std::map<hitDir, float> dur_punches = {{LEFT, .2}, {RIGHT, .2}};
 	std::map<hitDir, float> dur_windups = {{LEFT, .3}, {RIGHT, .3}};
+	std::map<hitDir, float> dur_winddowns = {{LEFT, .2}, {RIGHT, .2}};
 
 	float strength = .1;
 
 	ClipPair* cp_idle    = cp_test_idle;
-	ClipPair* cp_windup  = cp_test_windup;
-	ClipPair* cp_hit     = cp_test_hit;
-	ClipPair* cp_punch   = cp_test_punch;
+	std::map<hitDir, ClipPair*> cp_windups  = {{LEFT, cp_test_windup}, {RIGHT, cp_test_windup}};
+	std::map<hitDir, ClipPair*> cp_winddowns= {{LEFT, cp_debug}, {RIGHT, cp_debug}};
+	std::map<hitDir, ClipPair*> cp_hits     = {{LEFT, cp_test_hit}, {RIGHT, cp_test_hit}};
+	std::map<hitDir, ClipPair*> cp_punches  = {{LEFT, cp_test_punch}, {RIGHT, cp_test_punch}};
+	std::map<hitDir, ClipPair*> cp_dodges  = {{LEFT, cp_debug}, {RIGHT, cp_debug}, {BACK, cp_debug}};
 	ClipPair* cp_stumble = cp_idle;
 	ClipPair* cp_victory = cp_debug;
 	ClipPair* cp_loss    = cp_debug;

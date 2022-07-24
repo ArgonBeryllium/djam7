@@ -1,6 +1,7 @@
 #include "states.h"
 #include "boxer.h"
 
+SwitchingState* SwitchingState::instance;
 State::State(StateData* data_) : data(data_)
 {
 	get_next = [this]() { return new IdleState(data); };

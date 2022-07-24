@@ -9,10 +9,8 @@
 - [x] replace Texture** with Clips
 - [x] introduce differentiation between being hit and other interrupts (act(), acting bool unset by Idle?)
 - [x] K/Os
-## 2h
-- [ ] main character art
-## 1h
-- [ ] background art
+- [x] main character art
+- [x] background art
 ## 3h
 - [ ] opponent #1
 	- [ ] sprites

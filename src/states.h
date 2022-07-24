@@ -42,9 +42,10 @@ struct IdleState : State
 
 struct HitState : State
 {
-	HitState(StateData* data_) : State(data_)
+	hitDir dir;
+	HitState(StateData* data_, hitDir dir_ = std::rand()%2?LEFT:RIGHT) : State(data_), dir(dir_)
 	{
-		cp = data->cp_hit;
+		cp = data->cp_hits[dir];
 		dur = data->dur_hit;
 		if(!data->parent->is_player() && ScoreKeeper::getStreak())
 			dur -= .05*ScoreKeeper::getStreak();
@@ -52,7 +53,7 @@ struct HitState : State
 	void enter() override
 	{
 		if(!data->parent->is_player())
-			ScoreKeeper::punch();
+			ScoreKeeper::punch(dir);
 	}
 	void exit(State* next) override
 	{
@@ -61,15 +62,25 @@ struct HitState : State
 			ScoreKeeper::finishCombo();
 	}
 };
+struct WinddownState : State
+{
+	WinddownState(StateData* data_, hitDir dir = LEFT) : State(data_)
+	{
+		dur = data->dur_winddowns[dir];
+		cp = data->cp_winddowns[dir];
+		vuln = dir;
+	}
+};
 struct PunchState : State
 {
 	bool hit = 0;
 	PunchState(StateData* data_, hitDir dir = LEFT) : State(data_)
 	{
+		get_next = [this, dir]() { return new WinddownState(data, dir); };
 		vuln = NONE;
 		dur = data->dur_punches[dir];
 		dmg = dir;
-		cp = data->cp_punch;
+		cp = data->cp_punches[dir];
 	}
 	void update() override
 	{
@@ -97,7 +108,7 @@ struct WindupState : State
 	{
 		get_next = [this, dir]() { return new PunchState(data, dir); };
 		dur = data->dur_windups[dir];
-		cp = data->cp_windup;
+		cp = data->cp_windups[dir];
 	}
 };
 
@@ -113,11 +124,15 @@ struct DodgeState : State
 
 struct SwitchingState : State
 {
+	static SwitchingState* instance;
 	SwitchingState(StateData* data_) : State(data_)
 	{
 		interruptable = false;
 		cp = data->cp_idle;
+		instance = this;
 	}
+	void enter() override { instance = this; }
+	void exit(State* next) override { instance = nullptr; }
 	void update() override
 	{
 		data->parent->pos = cumt::common::lerp(data->parent->pos, data->parent->is_player()?GM::spot_p:GM::spot_o, completion());
