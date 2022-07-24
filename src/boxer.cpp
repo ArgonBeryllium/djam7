@@ -70,7 +70,7 @@ void Boxer::forceState(State *next, bool interrupt)
 State* Boxer::pickAction()
 {
 	if(common::frand()>.5)
-		return new WindupState(&sd);
+		return new WindupState(&sd, std::rand()%2?LEFT:RIGHT);
 	return new IdleState(&sd);
 }
 
