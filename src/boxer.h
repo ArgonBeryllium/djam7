@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL_render.h>
 #include <cumt_things.h>
+#include <functional>
 #include "assets.h"
 
 struct State;
@@ -27,6 +28,7 @@ struct StateData
 	ClipPair* cp_windup  = cp_test_windup;
 	ClipPair* cp_hit     = cp_test_hit;
 	ClipPair* cp_punch   = cp_test_punch;
+	ClipPair* cp_stumble = cp_idle;
 	ClipPair* cp_victory = cp_debug;
 	ClipPair* cp_loss    = cp_debug;
 };
@@ -39,7 +41,7 @@ struct Boxer : cumt::Thing2D
 
 	float max_health = 1, health;
 	void takeDamage(float dmg);
-	virtual void knockOut();
+	virtual std::function<State*()> getKnockOutResult();
 
 	bool acting = false;
 	bool act(State* next);

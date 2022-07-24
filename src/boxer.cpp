@@ -1,3 +1,4 @@
+#include <functional>
 #include <stack>
 #include "boxer.h"
 #include "cumt_common.h"
@@ -23,15 +24,17 @@ void Boxer::takeDamage(float dmg)
 {
 	health -= dmg;
 	if(health<=0)
-		knockOut();
+		setState(new StumbleState(&sd));
 }
-void Boxer::knockOut()
+std::function<State*()> Boxer::getKnockOutResult()
 {
 	GM::finishRound(this);
+	return [this]() { return new LossState(&sd); };
 }
 
 bool Boxer::act(State* next)
 {
+	if(GM::getFreeze()) return false;
 	if(acting) return false;
 	acting = true;
 	return setState(next);
@@ -40,7 +43,7 @@ bool Boxer::act(State* next)
 static std::stack<State*> to_delete;
 bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
 {
-	if(interrupt && !state->interruptable)
+	if((interrupt && !state->interruptable) || GM::getFreeze())
 	{
 		if(auto_delete)
 			delete next;

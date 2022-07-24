@@ -81,6 +81,15 @@ struct PunchState : State
 			hit = true;
 		}
 	}
+	void exit(State* next) override
+	{
+		if(!hit && data->parent->is_player())
+		{
+			// takeDamage may call setState, which calls this function, so I'm reusing hit as a loop guard
+			hit = true;
+			data->parent->takeDamage(.05);
+		}
+	}
 };
 struct WindupState : State
 {
@@ -113,6 +122,32 @@ struct SwitchingState : State
 	{
 		data->parent->pos = cumt::common::lerp(data->parent->pos, data->parent->is_player()?GM::spot_p:GM::spot_o, completion());
 	}
+};
+
+struct StumbleState : State
+{
+	StumbleState(StateData* data_) : State(data_)
+	{
+		get_next = [this]() { return data->parent->getKnockOutResult()(); };
+		interruptable = false;
+		vuln = NONE;
+		cp = data->cp_stumble;
+		dur = 5;
+	}
+
+	void enter() override
+	{
+		GM::setFreeze();
+	}
+	void exit(State* next) override
+	{
+		GM::setFreeze(false);
+	}
+	void update() override
+	{
+		using namespace cumt;
+		data->parent->pos = (data->parent->is_player()?GM::spot_p:GM::spot_o) + v2f(std::sin(FD::time*2)*.2*(1-completion()), 0);
+	};
 };
 
 struct VictoryState : State

@@ -5,13 +5,10 @@
 - [x] dodge durs
 
 # important
-## 1h
 - [x] left/right punches & windups & hits
 - [x] replace Texture** with Clips
-## 30m
 - [x] introduce differentiation between being hit and other interrupts (act(), acting bool unset by Idle?)
-## 30m
-- [ ] K/Os
+- [x] K/Os
 ## 2h
 - [ ] main character art
 ## 1h

@@ -7,13 +7,15 @@ Boxer* GM::player, *GM::opponent;
 v2f GM::spot_p = {0,.2}, GM::spot_o = {0, -.2};
 static Boxer* op;
 
-static bool swap = false, is_finished = false;
+static bool swap = false, is_finished = false, freeze = false;
 static Boxer* loser;
 
 void GM::init(Boxer *p, Boxer *o)
 {
 	swap = false;
 	is_finished = false;
+	freeze = false;
+
 	op = player = p;
 	opponent = o;
 	p->pos = spot_p;
@@ -22,6 +24,8 @@ void GM::init(Boxer *p, Boxer *o)
 
 bool GM::finished() { return is_finished; }
 bool GM::playerWon() { return player != loser && player == op; }
+bool GM::getFreeze() { return freeze; }
+void GM::setFreeze(bool f) { freeze = f; }
 
 void GM::prepSwap()
 {
@@ -35,6 +39,7 @@ void GM::update()
 		opponent->forceState(new SwitchingState(&opponent->sd));
 		std::swap(player, opponent);
 		swap = false;
+		setFreeze(false);
 	}
 }
 void GM::render()
@@ -50,6 +55,7 @@ void GM::render()
 void GM::finishRound(Boxer *loser_)
 {
 	is_finished = true;
+	setFreeze();
 	loser = loser_;
 	loser->forceState(new LossState(&loser->sd));
 	loser->opponent->forceState(new VictoryState(&loser->sd));
