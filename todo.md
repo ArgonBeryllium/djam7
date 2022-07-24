@@ -11,17 +11,16 @@
 - [x] K/Os
 - [x] main character art
 - [x] background art
-## 3h
 - [ ] opponent #1
 	- [ ] sprites
-	- [ ] special attacks
-## 1h
-- [ ] intermission screens
+	- [ ] values
 - [ ] main menu
+- [ ] proper health bars
 
 # nice
 - [ ] combo dialogue fx
 - [ ] logo animation
+# would've been nice
 - [ ] sfx
 	- [ ] victory
 	- [ ] loss
@@ -29,7 +28,9 @@
 	- [ ] hit (player)
 	- [ ] hit (opponent)
 	- [ ] K.O.
+- [ ] intermission screens
 - [ ] background music
+- [ ] opponent special attacks
 - [ ] opponent #2
 	- [ ] sprites
 	- [ ] special attacks
