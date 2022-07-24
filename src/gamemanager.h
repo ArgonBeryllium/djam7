@@ -6,5 +6,9 @@ struct GM
 	static Boxer* player, *opponent;
 	static void init(Boxer* p, Boxer* o);
 	static void prepSwap();
+	static void finishRound(Boxer* loser);
+	static bool finished();
+	static bool playerWon();
 	static void update();
+	static void render();
 };

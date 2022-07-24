@@ -47,15 +47,15 @@ struct GameScene : Scene
 		a->opponent = b;
 		b->opponent = a;
 
-		a->sd.dur_windup = .2;
-		a->sd.dur_punch = .1;
+		a->sd.dur_windups[LEFT] = .2;
+		a->sd.dur_punches[LEFT] = .1;
 
 		b->sd.tex_idle = t_test2_idle;
 		b->sd.tex_punch = t_test2_punch;
 		b->sd.tex_windup = t_test2_windup;
 		b->sd.tex_hit = t_test2_hit;
-		b->sd.dur_windup = .5;
-		b->sd.dur_punch = .2;
+		b->sd.dur_windups[LEFT] = .5;
+		b->sd.dur_punches[LEFT] = .2;
 		b->sd.dur_hit = .7;
 
 		GM::init(a, b);
@@ -73,15 +73,37 @@ struct GameScene : Scene
 		set.render();
 		getP()->render();
 		ScoreKeeper::render();
+		GM::render();
 	}
 	void onKey(SDL_Keycode k) override
 	{
 		switch(k)
 		{
+			case SDLK_p:
+				getP()->takeDamage(getP()->health);
+				break;
+			case SDLK_o:
+				getO()->takeDamage(getO()->health);
+				break;
+			case SDLK_r:
+				unload();
+				load();
+				break;
+			case SDLK_SPACE:
+				GM::prepSwap();
+				break;
+			default: break;
+		}
+		if(GM::finished()) return;
+		// TODO find a better way to compare state types
+		if(!dynamic_cast<IdleState*>(getP()->state)) return;
+		switch(k)
+		{
 			case SDLK_z:
-				// TODO find a better way to compare state types
-				if(!dynamic_cast<WindupState*>(getP()->state))
-					getP()->setState(new WindupState(&getP()->sd));
+					getP()->setState(new WindupState(&getP()->sd, LEFT));
+				break;
+			case SDLK_x:
+					getP()->setState(new WindupState(&getP()->sd, RIGHT));
 				break;
 			case SDLK_LEFT:
 			case SDLK_a:
@@ -94,15 +116,6 @@ struct GameScene : Scene
 			case SDLK_DOWN:
 			case SDLK_s:
 				getP()->setState(new DodgeState(&getP()->sd, BACK));
-				break;
-
-			case SDLK_r:
-				unload();
-				load();
-				break;
-			case SDLK_SPACE:
-				a->setState(new SwitchingState(&a->sd), false);
-				b->setState(new SwitchingState(&b->sd), false);
 				break;
 			default: break;
 		}
@@ -141,8 +154,8 @@ void gameKeyDown(const SDL_Keycode& k)
 int main()
 {
 	InitParams ip;
-	ip.sr_ps = 2;
-	quickInit(540, 720, ip);
+	ip.sr_ps = 1;
+	quickInit(720, 540, ip);
 
 	gameSetup();
 	onLoop = gameLoop;

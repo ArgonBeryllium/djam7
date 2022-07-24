@@ -1,19 +1,26 @@
 # critical
-- [ ] health
-- [ ] win/lose states
-- [ ] score display
-- [ ] dodge durs
+- [x] health
+- [x] win/lose states
+- [x] score display
+- [x] dodge durs
 
 # important
-- [ ] left/right punches & windups & hits
+## 1h
+- [x] left/right punches & windups & hits
 - [ ] replace Texture** with Clips
-- [ ] introduce differentiation between being hit and other interrupts
+## 30m
+- [ ] introduce differentiation between being hit and other interrupts (act(), acting bool unset by Idle?)
+## 30m
 - [ ] K/Os
+## 2h
 - [ ] main character art
+## 1h
 - [ ] background art
+## 3h
 - [ ] opponent #1
 	- [ ] sprites
 	- [ ] special attacks
+## 1h
 - [ ] intermission screens
 - [ ] main menu
 

@@ -1,6 +1,7 @@
 #include "boxer.h"
 #include "cumt_common.h"
 #include "gamemanager.h"
+#include "shitrndr/src/shitrndr.h"
 #include "states.h"
 
 using namespace cumt;
@@ -17,6 +18,16 @@ Boxer::~Boxer()
 }
 
 bool Boxer::is_player() { return this==GM::player; }
+void Boxer::takeDamage(float dmg)
+{
+	health -= dmg;
+	if(health<=0)
+		knockOut();
+}
+void Boxer::knockOut()
+{
+	GM::finishRound(this);
+}
 
 static State* to_delete = nullptr;
 bool Boxer::setState(State *next, bool interrupt, bool auto_delete)
@@ -62,4 +73,9 @@ void Boxer::render()
 {
 	using namespace shitrndr;
 	Copy(state->tex[is_player()], getRect());
+	SDL_Rect r = getRect();
+	r.h /= 10;
+	r.w *= health;
+	SetColour({0,255,0,255});
+	FillRect(r);
 }

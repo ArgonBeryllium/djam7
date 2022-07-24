@@ -1,17 +1,28 @@
 #include "gamemanager.h"
+#include "shitrndr/src/shitrndr.h"
 #include "states.h"
 using namespace cumt;
 
 Boxer* GM::player, *GM::opponent;
 v2f GM::spot_p = {0,.2}, GM::spot_o = {0, -.2};
+static Boxer* op;
+
+static bool swap = false, is_finished = false;
+static Boxer* loser;
+
 void GM::init(Boxer *p, Boxer *o)
 {
-	player = p;
+	swap = false;
+	is_finished = false;
+	op = player = p;
 	opponent = o;
 	p->pos = spot_p;
 	o->pos = spot_o;
 }
-static bool swap = false;
+
+bool GM::finished() { return is_finished; }
+bool GM::playerWon() { return player != loser && player == op; }
+
 void GM::prepSwap()
 {
 	swap = true;
@@ -25,4 +36,21 @@ void GM::update()
 		std::swap(player, opponent);
 		swap = false;
 	}
+}
+void GM::render()
+{
+	if(is_finished)
+	{
+		if(playerWon())
+			render::text(shitrndr::WindowProps::getSize()/2, "win :)");
+		else
+			render::text(shitrndr::WindowProps::getSize()/2, "lmao L");
+	}
+}
+void GM::finishRound(Boxer *loser_)
+{
+	is_finished = true;
+	loser = loser_;
+	loser->setState(new LossState(&loser->sd), false);
+	loser->opponent->setState(new VictoryState(&loser->sd), false);
 }
