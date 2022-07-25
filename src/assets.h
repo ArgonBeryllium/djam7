@@ -73,7 +73,7 @@ inline static void loadAssets()
 	using namespace cumt;
 	cumt::RenderData::initTTF();
 
-	RenderData::loadFont("res/m6x11.ttf", 22);
+	RenderData::loadFont("res/m6x11.ttf", 14);
 
 	td_c = new render::TextData;
 	td_c->anchor = render::TextData::CENTRE;

@@ -84,7 +84,7 @@ struct MenuScene : Scene
 	void load() override
 	{
 		shitrndr::bg_col = COL_BG;
-		Thing2D::view_scale = 6;
+		Thing2D::view_scale = 3;
 		Thing2D::view_pos = {.5, .5};
 		tp = set.instantiate(new TutorialPlayer);
 		GM::init(tp, tp);
@@ -93,8 +93,9 @@ struct MenuScene : Scene
 	{
 		using namespace shitrndr;
 		render::text(v2f(0.5,.2)*WindowProps::getSize(), "MODULO SWAP", *td_c);
-		render::text(v2f(0.5,.3)*WindowProps::getSize(), "Every time you have an odd-numbered combo, you swap with your opponent.", *td_c);
-		render::text(v2f(0.5,.35)*WindowProps::getSize(), "Alternating punches get more points.", *td_c);
+		render::text(v2f(0.5,.3)*WindowProps::getSize(), "Every time you have an odd-numbered", *td_c);
+		render::text(v2f(0.5,.35)*WindowProps::getSize(), "combo, you swap with your opponent.", *td_c);
+		render::text(v2f(0.5,.4)*WindowProps::getSize(), "Alternating punches get more points.", *td_c);
 		render::text(v2f(0.5,.6)*WindowProps::getSize(), "[Z] and [X] to PUNCH", *td_c);
 		render::text(v2f(0.5,.65)*WindowProps::getSize(), "arrow keys to DODGE", *td_c);
 		render::text(v2f(0.5,.7)*WindowProps::getSize(), "[ESC] or [Q] to QUIT", *td_c);
@@ -141,7 +142,7 @@ struct GameScene : Scene
 	{
 		using namespace shitrndr;
 		bg_col = {45,25,45,255};
-		Thing2D::view_scale = 8;
+		Thing2D::view_scale = 4;
 		Thing2D::view_pos = {.5, .5};
 
 		a = set.instantiate(new Player(), "boxer A");
@@ -260,7 +261,7 @@ void gameKeyDown(const SDL_Keycode& k)
 int main()
 {
 	InitParams ip;
-	ip.sr_ps = 1;
+	ip.sr_ps = 2;
 	quickInit(720, 540, ip);
 
 	gameSetup();
